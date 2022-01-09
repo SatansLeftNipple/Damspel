@@ -61,14 +61,31 @@ class Spela(Spelbräda):
         "kollar efter lagliga drag"
 
 
-    def kolla_ifall_vald_pjäs_finns(self, vald_pjäs_koordinater):
+    def kolla_ifall_vald_pjäs_finns(self, pjäs, attackerade_pjäser=0):
         """ kollar ifall vald_pjäs anger en position på brädan där det antingen står 1 eller 2 alltså in 0
             input: lista av integers
             output: True eller False"""
-        if self.spelbräda[vald_pjäs_koordinater[0]][vald_pjäs_koordinater[1]] == 0:
-            return False
-        else:
-            return True
+        if attackerade_pjäser == 0:
+            if self.spelbräda[pjäs[0]][pjäs[1]] == 0:
+                return False
+            else:
+                return True
+        elif attackerade_pjäser == 1:
+            if self.spelbräda[pjäs[0]-1][pjäs[1]+1] > 0 or self.spelbräda[pjäs[0]-1][pjäs[1]-1] > 0:
+                return True 
+            else:
+                return False    
+        elif attackerade_pjäser == 2:
+            if self.spelbräda[pjäs[0]+1][pjäs[1]+1] > 0 or self.spelbräda[pjäs[0]+1][pjäs[1]-1] > 0:
+                return True 
+            else:
+                return False     
+        elif attackerade_pjäser == 3:
+            if self.spelbräda[pjäs[0]-1][pjäs[1]+1] > 0 or self.spelbräda[pjäs[0]-1][pjäs[1]-1] > 0 or self.spelbräda[pjäs[0]+1][pjäs[1]+1] > 0 or self.spelbräda[pjäs[0]+1][pjäs[1]-1] > 0:
+                return True 
+            else:
+                return False
+
 
     def kolla_dragdiagonalitet(self, pjäs, plats):
         """ kollar så de valda draget är diagonalt
@@ -83,8 +100,23 @@ class Spela(Spelbräda):
             return False
 
     def kolla_ta_pjäs(self, pjäs, plats):
-        attackerad_pjäs = list(map(sum,zip(pjäs,[1,1])))
-        if 3 > abs(pjäs[0]-plats[0]) > 1 and self.kolla_ifall_vald_pjäs_finns(attackerad_pjäs) == True:
+        """ Först kollas ifall pjäsen vald i matrisen är 1, 2 eller 3 för att se vilka platser funktionen skall kolla efter pjäser
+            där 3 är en befodrad pjäs
+            input: två listor av integers som båda innehåller två integers
+            output: False eller True"""
+        if self.spelbräda[pjäs[0]][pjäs[1]] == 1:
+            attackerade_pjäser = 1
+
+        elif  self.spelbräda[pjäs[0]][pjäs[1]] == 2:
+            attackerade_pjäser = 2
+
+        elif  self.spelbräda[pjäs[0]][pjäs[1]] == 3:
+            attackerade_pjäser = 3
+
+        rad_skillnad = pjäs[0]-plats[0]
+        kolonn_skillnad = pjäs
+
+        if 3 > abs(pjäs[0]-plats[0]) > 1 and self.kolla_ifall_vald_pjäs_finns(pjäs, attackerade_pjäser) == True:
             return True
         else:
             return False
