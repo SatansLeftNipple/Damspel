@@ -64,9 +64,9 @@ class Spela(Spelbräda):
 
 
     def kolla_ifall_vald_pjäs_finns(self, pjäs, attackerad_pjäs=[0,0]):
-        """ kollar ifall vald_pjäs anger en position på brädan där det antingen står 1 eller 2 alltså in 0
-            input: lista av integers
-            output: True eller False"""
+        #kollar ifall vald_pjäs anger en position på brädan där det antingen står 1 eller 2 alltså in 0
+        #input: lista av integers
+        #output: True eller False"""
         #sparar värdena i någonting mer lätthanterligt
         pjäs_typ = self.spelbräda[pjäs[0]][pjäs[1]]
         attackerad_pjäs_typ = self.spelbräda[attackerad_pjäs[0]][attackerad_pjäs[1]]
@@ -85,9 +85,9 @@ class Spela(Spelbräda):
                 return False    
 
     def kolla_dragdiagonalitet(self, pjäs, plats):
-        """ kollar så de valda draget är diagonalt
-            input: två listor av integers
-            outpt: True eller False""" "True diagonality, oavsett hur långt de är ifrån varandra"
+        #kollar så de valda draget är diagonalt
+        #input: två listor av integers
+        #outpt: True eller False""" "True diagonality, oavsett hur långt de är ifrån varandra
         try:
             if abs(pjäs[0]-plats[0])/abs(pjäs[1]-plats[1]) != 1:
                 return False
@@ -97,10 +97,10 @@ class Spela(Spelbräda):
             return False
 
     def kolla_ta_pjäs(self, pjäs, plats):
-        """ Först kollas ifall pjäsen vald i matrisen är 1, 2 eller 3 för att se vilka platser funktionen skall kolla efter pjäser
-            där 3 är en befodrad pjäs sedan kollas så att platsen vald att gå till ligger på rätt avstånd
-            input: två listor av integers som båda innehåller två integers
-            output: False eller True"""
+        #Först kollas ifall pjäsen vald i matrisen är 1, 2 eller 3 för att se vilka platser funktionen skall kolla efter pjäser
+        #där 3 är en befodrad pjäs sedan kollas så att platsen vald att gå till ligger på rätt avstånd
+        #input: två listor av integers som båda innehåller två integers
+        #output: False eller True
         #två if satser som bestämmer rad/kolonn skillnad mellan vald pjäs och attackerad pjäs
         if plats[0] > pjäs[0]:
             attackerad_pjäs = [1,0]
@@ -366,7 +366,45 @@ def huvudprogram():
     symbol2 = input("välj symbol") 
     global bräda
     bräda = Spela(matrisstorlek, symbol1, symbol2)
+    index = 0
     while True:
+        index += 1
+        befordra_pjäser()
+        print(bräda)
+        if index % 2 != 0:
+            while True:
+                pjäs, plats = välj_pjäser_spelare1()
+                if obligatoriska_drag == True:
+                    print("Det finns obligatoriska drag att göra")
+                    continue
+                if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
+                    continue
+                ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
+                if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
+                    continue
+                elif ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == True:
+                    kolla_drag = 
+
+                utför_drag(pjäs, plats, attackerad_pjäs)
+                vinst = kolla_vinst() #True eller False
+                break
+        else:
+            while True:
+                pjäs, plats = välj_pjäser_spelare2()
+                if obligatoriska_drag == True:
+                    print("Det finns obligatoriska drag att göra")
+                    continue
+                if kolla_pjäser(pjäs, plats) == False:
+                    continue
+                utför_drag(pjäs, plats)
+                vinst = kolla_vinst() #True eller False
+                break
+            
+        if vinst == True:
+            break
+    print(f"grattis spelare {(index % 2)+1} har vunnit")
+    
+"""while True:
         befordra_pjäser()
         print(bräda)
         print(bräda.spelbräda)
@@ -388,40 +426,11 @@ def huvudprogram():
                         bräda.flytta_pjäs(attackerad_pjäs, attackerad_pjäs)
                         break
 
-        bräda.flytta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater)
-    
-
-    """index = 0
-    while True:
-        index += 1
-        befordra_pjäser()
-        print(bräda)
-        if index % 2 != 0:
-            while True:
-                pjäser = välj_pjäser_spelare1()
-                granska_spelplan() # kolla efter vilka drag som måste göras
-                if kolla_pjäser(pjäser) == False: #i ordning, 
-                    continue
-                utför_drag(pjäser)
-                vinst = kolla_vinst() #True eller False
-                break
-        else:
-            while True:
-                pjäser = välj_pjäser_spelare2()
-                if kolla_pjäser(pjäser) == False:
-                    continue
-                utför_drag(pjäser)
-                vinst = kolla_vinst() #True eller False
-                break
-            
-        if vinst == True:
-            break
-    print(f"grattis spelare {(index % 2)+1} har vunnit")"""
+        bräda.flytta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater)"""
     
 
 
-
-    """while True:
+"""while True:
         print(bräda)
         for i in range(1,3):
             if i == 1:
