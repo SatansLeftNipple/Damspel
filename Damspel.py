@@ -414,7 +414,6 @@ def huvudprogram():
                     continue
                 ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
                 if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
-                    index += 1
                     pass
                 elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
                     print("Det finns obligatoriska drag att göra")
@@ -435,7 +434,8 @@ def huvudprogram():
                 break
         if bräda.kolla_vinst() == True:
             break
-    print(f"grattis spelare {(index % 2)+1} har vunnit")
+    print(bräda)
+    print(f"grattis spelare {(index % 2)+1} har förlorat")
     
 """while True:
         befordra_pjäser()
