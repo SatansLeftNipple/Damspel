@@ -252,22 +252,6 @@ def kolla_dragdiagonalitet(pjäs, plats):
             plats = välj_och_kolla_plats()
     return plats
 
-def kolla_ta_pjäs_eller_flytta(pjäs, plats):
-    while True:
-        ta_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
-        laglig_sträcka = bräda.kolla_laglilg_sträcka_flytta(pjäs, plats)
-        if ta_pjäs == True:
-            break
-        elif laglig_sträcka == True:
-            break
-        else:
-            print("\nEn pjäs kan bara röra sig en ruta i taget om den inte hoppar över en motståndarpjäs: ")
-            plats = välj_och_kolla_plats()
-    return plats
-
-def kolla_vinst():
-    pass
-
 def obligatoriska_drag(pjäs):
     #input är ett värde antingen 1 eller 2 för att ange vilken spelares tur det är
     #output är bool värde
@@ -366,6 +350,62 @@ def befordra_pjäser():
         if värde == 1:
             bräda.spelbräda[bräda.matrisstorlek - 1][index] = 10
 
+def spelare1(index):
+    while True:
+        pjäs, plats = välj_pjäser_spelare1()
+        if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
+            continue
+        ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
+        if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
+            pass
+        elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
+            print("\nDet finns obligatoriska drag att göra")
+            continue
+        if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
+            print("\nså får du inte göra, din lilla råtta: ")
+            continue
+        if bräda.kolla_laglig_rikting(pjäs, plats) == False:
+            print("\ndu kan inte röra dig i den riktningnen")
+            continue
+        #måste kolla efter möjliga drag att ta pjäser, ifall det är True måste spelare ett göra ett till drag och därför plussas index med 1
+        ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
+        try:
+            if obligatoriska_drag(ny_pjäs) == True:
+                print("det finns obligatoriska drag att göra")
+                index += 1
+                continue
+        except:
+            pass
+        if bräda.kolla_vinst() == True:
+            break
+        break
+
+def spelare2(index):
+    while True:
+        pjäs, plats = välj_pjäser_spelare2()
+        if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
+            continue
+        ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
+        if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
+            pass
+        elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
+            print("Det finns obligatoriska drag att göra")
+            continue
+        if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
+            print("så får du inte göra, din lilla råtta: ")
+            continue
+        ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
+        try:
+            if obligatoriska_drag(ny_pjäs) == True:
+                print("det finns obligatoriska drag att göra")
+                index += 1
+                continue
+        except:
+            pass
+        if bräda.kolla_vinst() == True:
+            break
+        break
+
 def huvudprogram():
     print("\nVälkommen till damspelet")
     matrisstorlek = int(input("Hur stor bräda vill du ha? "))
@@ -379,104 +419,13 @@ def huvudprogram():
         befordra_pjäser()
         print(bräda)
         if index % 2 != 0:
-            while True:
-                pjäs, plats = välj_pjäser_spelare1()
-                if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
-                    continue
-                ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
-                if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
-                    pass
-                elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
-                    print("\nDet finns obligatoriska drag att göra")
-                    continue
-                if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
-                    print("\nså får du inte göra, din lilla råtta: ")
-                    continue
-                if bräda.kolla_laglig_rikting(pjäs, plats) == False:
-                    print("\ndu kan inte röra dig i den riktningnen")
-                    continue
-                #måste kolla efter möjliga drag att ta pjäser, ifall det är True måste spelare ett göra ett till drag och därför plussas index med 1
-                ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
-                try:
-                    if obligatoriska_drag(ny_pjäs) == True:
-                        print("det finns obligatoriska drag att göra")
-                        index += 1
-                        continue
-                except:
-                    pass
-                if bräda.kolla_vinst() == True:
-                    break
-                break
+            spelare1(index)
         else:
-            while True:
-                pjäs, plats = välj_pjäser_spelare2()
-                if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
-                    continue
-                ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
-                if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
-                    pass
-                elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
-                    print("Det finns obligatoriska drag att göra")
-                    continue
-                if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
-                    print("så får du inte göra, din lilla råtta: ")
-                    continue
-                ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
-                try:
-                    if obligatoriska_drag(ny_pjäs) == True:
-                        print("det finns obligatoriska drag att göra")
-                        index += 1
-                        continue
-                except:
-                    pass
-                if bräda.kolla_vinst() == True:
-                    break
-                break
+            spelare2(index)
+
         if bräda.kolla_vinst() == True:
             break
     print(bräda)
-    print(f"grattis spelare {(index % 2)+1} har förlorat")
-    
-"""while True:
-        befordra_pjäser()
-        print(bräda)
-        print(bräda.spelbräda)
-        for i in range(1,3):
-            if i == 1:
-                typ_av_drag = "välj"
-                print("\nvälj en pjäs att flytta")
-                vald_pjäs_koordinater = välj_och_kolla_plats(typ_av_drag)
-            else: 
-                typ_av_drag = "flytta"
-                print("\nvälj en plats att flytta till")
-                while True:
-                    vald_plats_koordinater = kolla_dragdiagonalitet(vald_pjäs_koordinater, välj_och_kolla_plats(typ_av_drag))
-                    attack = bräda.kolla_ta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater)
-                    if attack == False:
-                        break
-                    else: 
-                        _, attackerad_pjäs = bräda.kolla_ta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater)
-                        bräda.flytta_pjäs(attackerad_pjäs, attackerad_pjäs)
-                        break
-
-        bräda.flytta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater)"""
-    
-
-
-"""while True:
-        print(bräda)
-        for i in range(1,3):
-            if i == 1:
-                typ_av_drag = "välj"
-                print("\nvälj en pjäs att flytta")
-                vald_pjäs_koordinater = välj_och_kolla_plats(typ_av_drag)
-            else: 
-                typ_av_drag = "flytta"
-                print("\nvälj en plats att flytta till")
-                vald_plats_koordinater = välj_och_kolla_plats(typ_av_drag)
-                dragdiagonalitet = bräda.kolla_dragdiagonalitet(vald_pjäs_koordinater, vald_plats_koordinater)
-
-                vald_plats_koordinater, attackerad_pjäs = kolla_ta_pjäs_eller_flytta(vald_pjäs_koordinater, dragdiagonalitet)
-        bräda.flytta_pjäs(vald_pjäs_koordinater, vald_plats_koordinater) """
+    print(f"spelare {(index % 2)+1} har förlorat")
     
 huvudprogram()
