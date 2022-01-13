@@ -61,6 +61,8 @@ class Spelbräda:
         self.spelbräda[plats[0]][plats[1]] = self.spelbräda[pjäs[0]][pjäs[1]]
         self.spelbräda[pjäs[0]][pjäs[1]] = 0
         self.spelbräda[attackerad_pjäs[0]][attackerad_pjäs[1]] = 0
+        #returnar pjäs för att den nya positionen skall kunna användas i kolla_obligatoriska_drag i huvudfunktionen igen
+        return pjäs
 
 
 
@@ -140,6 +142,21 @@ class Spela(Spelbräda):
             return False
         else:
             return True
+
+    def kolla_vinst(self):
+        spelare1 = 0
+        spelare2 = 0
+        for rad in self.spelbräda:
+            for value in rad:
+                if value == 1 or value == 10:
+                    spelare1 += 1
+                elif value == 2 or value == 20:
+                    spelare2 += 1
+        if spelare1 == 0 or spelare2 == 0:
+            return True
+        else:
+            return False
+
         
     def kolla_obligatoriska_drag_höger_ner(self):
         # index1 tillhör rad och index2 tillhör kolonn
@@ -222,35 +239,6 @@ def bokstavskollen(bokstav):
             break        
     return str(bokstav)
         
-
-def välj_pjäs():
-        """funktion som frågar spelaren efter en ojäs och sparar koordinaterna i en lista som rad och kolonn
-           output: lista av 2 integers"""
-        vald_pjäs_koordinater = list(map(int,(bokstavskollen(input("Skriv position i ett nummer. Ex rad 2 och kolonn 4 blir 24: ")))))
-        for i in range(len(vald_pjäs_koordinater)): vald_pjäs_koordinater[i] = vald_pjäs_koordinater[i]-1
-        return vald_pjäs_koordinater
-
-def välj_och_kolla_plats(typ_av_drag = 0):
-    """ funtkion som ber användaren att välja en pjäs samt kollar så att det står en pjäs på den platsen
-        input: string
-        output: lista av två integers """
-    while True:
-        vald_pjäs_koordinater = välj_pjäs()
-        pjäs_existerar = bräda.kolla_ifall_vald_pjäs_finns(vald_pjäs_koordinater)
-        if pjäs_existerar == True and typ_av_drag == "välj": 
-            break
-        elif pjäs_existerar == False and typ_av_drag == "flytta":
-            break
-        elif pjäs_existerar == False and typ_av_drag == "välj":
-            print("\nDet står ingen pjäs på den positionen ")
-            continue
-        elif pjäs_existerar == False and typ_av_drag == 0:
-            break
-        else:
-            print("\nDet står redan en pjäs på platsen du valt")
-            continue
-    return vald_pjäs_koordinater
-
 def kolla_dragdiagonalitet(pjäs, plats):
     """ Kollar diagonalitet i draget
         Input: två listor av integers
@@ -280,12 +268,6 @@ def kolla_ta_pjäs_eller_flytta(pjäs, plats):
 def kolla_vinst():
     pass
 
-def kolla_pjäser():
-    # ska samla alla false eller true statements, om ett enda är false returnerar funktionen False
-    #kolla ta pjäs
-    #kolla diagonalitet
-    pass
-
 def obligatoriska_drag(pjäs):
     #input är ett värde antingen 1 eller 2 för att ange vilken spelares tur det är
     #output är bool värde
@@ -297,7 +279,7 @@ def obligatoriska_drag(pjäs):
         if typ_pjäs == 10:
             höger_upp = bräda.kolla_obligatoriska_drag_höger_upp()
             vänster_upp = bräda.kolla_obligatoriska_drag_vänster_upp()
-            values.append(höger_upp, vänster_upp)
+            values.append((höger_upp, vänster_upp))
 
     elif typ_pjäs == 2 or typ_pjäs == 20:
         höger_upp = bräda.kolla_obligatoriska_drag_höger_upp()
@@ -306,7 +288,7 @@ def obligatoriska_drag(pjäs):
         if typ_pjäs == 20:
             höger_ner = bräda.kolla_obligatoriska_drag_höger_ner()
             vänster_ner = bräda.kolla_obligatoriska_drag_vänster_ner()
-            values.append(höger_ner, vänster_ner)
+            values.append((höger_ner, vänster_ner))
             
     if any(values) == True:
         return True
@@ -371,7 +353,9 @@ def utför_drag(pjäs, plats, attackerad_pjäs):
     if attackerad_pjäs == "":
         bräda.flytta_pjäs(pjäs, plats)
     else:
-        bräda.ta_pjäs(pjäs, plats, attackerad_pjäs)
+        # returnar ny_pjäs vilket är koordinaterna dit pjäsen befinner sig efter draget för att informationen måste användas i huvudfunktionen för att kolla_obligatoriska_drag
+        ny_pjäs = bräda.ta_pjäs(pjäs, plats, attackerad_pjäs)
+        return ny_pjäs
 
 def befordra_pjäser():
     #går igenom spelplanen och befodrar pjäser
@@ -396,13 +380,11 @@ def huvudprogram():
         print(bräda)
         if index % 2 != 0:
             while True:
-                spelare = 1
                 pjäs, plats = välj_pjäser_spelare1()
                 if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
                     continue
                 ta_pjäs, attackerad_pjäs = bräda.kolla_ta_pjäs(pjäs, plats)
                 if obligatoriska_drag(pjäs) == True and ta_pjäs == True:
-                    index += 1
                     pass
                 elif obligatoriska_drag(pjäs) == True and ta_pjäs == False:
                     print("\nDet finns obligatoriska drag att göra")
@@ -413,12 +395,20 @@ def huvudprogram():
                 if bräda.kolla_laglig_rikting(pjäs, plats) == False:
                     print("\ndu kan inte röra dig i den riktningnen")
                     continue
-                utför_drag(pjäs, plats, attackerad_pjäs)
-                vinst = kolla_vinst() #True eller False
+                #måste kolla efter möjliga drag att ta pjäser, ifall det är True måste spelare ett göra ett till drag och därför plussas index med 1
+                ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
+                try:
+                    if obligatoriska_drag(ny_pjäs) == True:
+                        print("det finns obligatoriska drag att göra")
+                        index += 1
+                        continue
+                except:
+                    pass
+                if bräda.kolla_vinst() == True:
+                    break
                 break
         else:
             while True:
-                spelare = 2
                 pjäs, plats = välj_pjäser_spelare2()
                 if kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
                     continue
@@ -432,11 +422,18 @@ def huvudprogram():
                 if ta_pjäs == False and bräda.kolla_laglilg_sträcka_flytta(pjäs, plats) == False:
                     print("så får du inte göra, din lilla råtta: ")
                     continue
-                utför_drag(pjäs, plats, attackerad_pjäs)
-                vinst = kolla_vinst() #True eller False
+                ny_pjäs = utför_drag(pjäs, plats, attackerad_pjäs)
+                try:
+                    if obligatoriska_drag(ny_pjäs) == True:
+                        print("det finns obligatoriska drag att göra")
+                        index += 1
+                        continue
+                except:
+                    pass
+                if bräda.kolla_vinst() == True:
+                    break
                 break
-            
-        if vinst == True:
+        if bräda.kolla_vinst() == True:
             break
     print(f"grattis spelare {(index % 2)+1} har vunnit")
     
