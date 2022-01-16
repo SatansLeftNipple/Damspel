@@ -364,11 +364,8 @@ def befordra_pjäser():
 def spelare1(index):
     #input: index som återfinns i huvudfunktionen för att hålla räkningen på vems tur det är
     #Output: tiden som det tagit att göra draget
-    starta_tid = 0 
-    avsluta_tid = 0
+    starta_tid = time.time()
     while True:
-        #här startas tiden
-        starta_tid = time.time()
         #pjäs och vart pjäsen ska väljs sen
         pjäs, plats = välj_pjäser_spelare1()
         #kollar så att draget var diagonalt annars får spelaren välja om draget
@@ -401,19 +398,16 @@ def spelare1(index):
         except:
             pass
         #här avslutas tiden eftersom draget är gjort
-        avsluta_tid = time.time()
         #tiden däremellan mäts och avrundas
-        spelare1_tid = round( avsluta_tid - starta_tid , 0)
+        spelare1_tid = round(time.time()-starta_tid , 0)
         break
     #är spelet vunnet returneras tiden det tog för spelaren
     return spelare1_tid
 
 
 def spelare2(index):
-    starta_tid = 0 
-    avsluta_tid = 0
+    starta_tid = time.time()
     while True:
-        starta_tid = time.time()
         pjäs, plats = välj_pjäser_spelare2()
         if bräda.kolla_dragdiagonalitet(pjäs, plats) == False: #i ordning, 
             continue
@@ -434,8 +428,7 @@ def spelare2(index):
                 continue
         except:
             pass
-        avsluta_tid = time.time()
-        spelare2_tid = round(avsluta_tid - starta_tid, 0)
+        spelare2_tid = round(time.time()-starta_tid, 0)
         break
     return spelare2_tid
 
@@ -450,14 +443,14 @@ def skapa_fil():
     innehåll_fil = fil.readlines()
     fil.close()
     for rad in innehåll_fil:
-        highscores.append(rad[:-1].split("."))
+        highscores.append(rad[:-1].split(","))
     return highscores
         
 def ändra_highscore(highscores, ny_tid):
     nytt_score = [str(ny_tid), input("Vad vill du heta i scoreboarden: ")] 
     if highscores != []:
         for index, värden in enumerate (highscores):
-            if int(värden[0]) > int(ny_tid) or int(värden[0]) == int(ny_tid):
+            if float(värden[0]) >= float(ny_tid):
                 highscores.insert(index, nytt_score)
                 break
     else:
@@ -468,12 +461,11 @@ def skriv_till_fil(highscores):
     ny_fil = ""
     fil = open(f"highscores_{bräda.matrisstorlek}x{bräda.matrisstorlek}.txt", "w")
     for värden in highscores:
-        ny_fil += f"{värden[0]}.{värden[1]}\n"
+        ny_fil += f"{värden[0]},{värden[1]}\n"
     fil.write(ny_fil)
     fil.close()
 
 def skriv_ut_fil(highscores):
-    print(highscores)
     utprint = ""
     for index, rad in enumerate(highscores, start=1):
         utprint += f"{index} {rad[0]}s {rad[1]}\n"
@@ -506,7 +498,7 @@ def huvudprogram():
     if index % 2 != 0:
         nya_highscores = ändra_highscore(highscores, tid1)
     else:
-        nya_highscores = ändra_highscore(highscores, tid1)
+        nya_highscores = ändra_highscore(highscores, tid2)
     skriv_till_fil(nya_highscores)
     skriv_ut_fil(nya_highscores)
         
